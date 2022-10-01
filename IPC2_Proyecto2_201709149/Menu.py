@@ -81,7 +81,7 @@ class Menu:
                             print("Carga realizada exitosamente.")
                             print("")
                             self.reader_obj.read_done = True
-                            self.reader_obj.proces_file()
+                            self.reader_obj.proces_file_1()
             elif selected_option_l == 2:
                 if self.reader_obj.read_done:
                     print("Borrando datos anterioes...")
@@ -94,13 +94,54 @@ class Menu:
                         print("Carga realizada exitosamente.")
                         print("")
                         self.reader_obj.read_done = True
-                        self.reader_obj.proces_file()                                
+                        self.reader_obj.proces_file_1()                                
                         back = True
             else:
                 print("La opción no es válida, intente de nuevo.")
                 print("")                
-        elif submenu_option_1 == 2:
+        elif submenu_option_1 == 2: # CARGA DE ARCHIVO 2
             print("Se cargará un archivo de configuración inicial (entrada 2).")
+            self.imprimir_menu_de_carga()
+            selected_option_l = 0
+            try:
+                selected_option_l = int(input())
+            except:
+                print("Error de entrada. Intente de nuevo")
+                print("")
+
+            if selected_option_l == 1:
+                if self.reader_obj.read_done:
+                    print("Borrando datos anterioes...")
+                    self.reader_obj.reset_all_r()
+                    print("Escriba una ruta específica:")
+                    root = input()
+                    if root == "":
+                        print("Dirección vacía.")
+                        print("")
+                    else:
+                        self.reader_obj.file_root = root
+                        if self.reader_obj.read_file():
+                            print("Carga realizada exitosamente.")
+                            print("")
+                            self.reader_obj.read_done = True
+                            self.reader_obj.proces_file_2()
+            elif selected_option_l == 2:
+                if self.reader_obj.read_done:
+                    print("Borrando datos anterioes...")
+                    self.reader_obj.reset_all_r()
+
+                print("Elija el archivo para cargarlo:")
+
+                if self.reader_obj.open_a_file():
+                    if self.reader_obj.read_file():
+                        print("Carga realizada exitosamente.")
+                        print("")
+                        self.reader_obj.read_done = True
+                        self.reader_obj.proces_file_2()                                
+                        back = True
+            else:
+                print("La opción no es válida, intente de nuevo.")
+                print("")  
         elif submenu_option_1 == 3:
             print("Se creará una empresa.")
         elif submenu_option_1 == 4:

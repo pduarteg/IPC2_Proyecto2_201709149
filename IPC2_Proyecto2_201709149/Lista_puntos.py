@@ -5,7 +5,7 @@ class Lista_puntos:
 	first = None
 	cant = 0
 
-	def agregar(self, punto):
+	def add(self, punto):
 		if self.first == None:
 			self.first = punto
 			self.cant += 1
