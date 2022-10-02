@@ -43,3 +43,12 @@ class Lista_puntos:
 		for i in range(pos-1):
 			actual = actual.next
 		return actual
+
+	def buscar_por_id(self, id):
+		temp = self.first
+
+		while temp != None:
+			if temp.id == id:
+				break
+			temp = temp.next
+		return temp

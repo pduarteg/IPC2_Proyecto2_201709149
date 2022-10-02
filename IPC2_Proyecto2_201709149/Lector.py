@@ -19,8 +19,7 @@ import Configuracion
 class Lector:
 
     file_root = None
-    file = None
-    read_done = False
+    file = None    
     procesed_data = False
 
     list_of_processed_companies = None
@@ -80,7 +79,7 @@ class Lector:
                         id = lista_de_empresas[i].attributes["id"].value
                         name = lista_de_empresas[i].getElementsByTagName("nombre")[0].childNodes[0].data
                         abb = lista_de_empresas[i].getElementsByTagName("abreviatura")[0].childNodes[0].data
-                        print("     Empresa con nombre: " + name + ", abreviatura: " + abb + " y id: " + id)
+                        print("     Empresa con nombre: " + name + ", abreviatura: " + abb + " e id: " + id)
                     except:                        
                         print("     No se han encontrado los atributos requerridos para el empresa. ")
                         print("     La empresa será omitida.")
@@ -125,7 +124,6 @@ class Lector:
                     self.list_of_processed_companies.add(new_company)
 
                 print("")
-                self.procesed_data = True
                 print("Información de empresas procesada correctamente.")
                 print("")
             else:
@@ -152,7 +150,7 @@ class Lector:
                     print("Obteniendo información de la configuración: #" + str(i+1) + "...")
                     print("     Verificando datos iniciales...")
 
-                    id = ""
+                    config_id = ""
                     company_id = ""
                     point_id = ""                    
 
@@ -194,7 +192,7 @@ class Lector:
                         new_client = Cliente.Cliente(dpi, client_name, new_transaction_list)
                         new_client_list.add(new_client)
 
-                    new_config = Configuracion.Configuracion(id, company_id, point_id, new_desk_list, new_client)
+                    new_config = Configuracion.Configuracion(config_id, company_id, point_id, new_desk_list, new_client)
                     if self.saved_settings == None:
                         self.saved_settings = Lista_configuraciones.Lista_configuraciones()
                     self.saved_settings.add(new_config)
@@ -213,7 +211,6 @@ class Lector:
     def reset_all_r(self):
         self.file_root = None
         self.file = None
-        self.read_done = False
         self.list_of_processed_companies = None
         self.procesed_data = False
         self.piso_calculado = None

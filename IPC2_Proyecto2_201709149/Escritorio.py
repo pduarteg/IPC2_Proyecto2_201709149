@@ -7,3 +7,6 @@ class Escritorio:
 		self.id = id
 		self.identification = identification
 		self.manager = manager
+
+	def set_state(self, value):
+		self.state = value

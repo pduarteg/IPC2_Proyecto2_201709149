@@ -43,13 +43,14 @@ class Menu:
 
     def print_submenu_1(self):
         print("")
-        print(" ---------------- Configuración de empresas: ----------------")
+        print("     ¯¨'*•~-.¸¸,.-~*'[ Configuración de Empresas ]¯¨'*•~-.¸¸,.-~*'")        
         print("")
         print(" [1] Cargar archivo de configuración del sistema.")        
         print(" [2] Cargar archivo de configuración inicial.")
-        print(" [3] Crear nueva empresa.")        
-        print(" [4] Limpiar sistema.")
-        print(" [5] Volver al menú principal.")
+        print(" [3] Crear nueva empresa.") 
+        print(" [4] Aplicar una configuración.")       
+        print(" [5] Limpiar sistema.")
+        print(" [6] Volver al menú principal.")
         print("")
         print("Escriba el número de acuerdo a la opción que desee: ")
         print("")
@@ -62,92 +63,40 @@ class Menu:
             submenu_option_1 = 0
 
         if submenu_option_1 == 1:            
-            print("Se cargará un archivo de entrada 1.")
-            self.imprimir_menu_de_carga()
-            selected_option_l = 0
-            try:
-                selected_option_l = int(input())
-            except:
-                print("Error de entrada. Intente de nuevo")
-                print("")
+            print(" - Elija el archivo para cargarlo:")
 
-            if selected_option_l == 1:                   
-                print("Escriba una ruta específica:")
-                root = input()
-                if root == "":
-                    print("Dirección vacía.")
+            if self.reader_obj.open_a_file():
+                if self.reader_obj.read_file():
+                    print(" *** Carga realizada exitosamente.")
                     print("")
-                else:
-                    self.reader_obj.file_root = root
-                    if self.reader_obj.read_file():
-                        print("Carga realizada exitosamente.")
-                        print("")
-                        self.reader_obj.read_done = True
-                        self.reader_obj.proces_file_1()
-            elif selected_option_l == 2:
-
-                print("Elija el archivo para cargarlo:")
-
-                if self.reader_obj.open_a_file():
-                    if self.reader_obj.read_file():
-                        print("Carga realizada exitosamente.")
-                        print("")
-                        self.reader_obj.read_done = True
-                        self.reader_obj.proces_file_1()                                
-                        back = True
-            else:
-                print("La opción no es válida, intente de nuevo.")
-                print("")                
+                    self.reader_obj.proces_file_1()                
         elif submenu_option_1 == 2: # CARGA DE ARCHIVO 2
-            print("Se cargará un archivo de configuración inicial (entrada 2).")
-            self.imprimir_menu_de_carga()
-            selected_option_l = 0
-            try:
-                selected_option_l = int(input())
-            except:
-                print("Error de entrada. Intente de nuevo")
-                print("")
+            print(" - Elija el archivo para cargarlo:")
 
-            if selected_option_l == 1:
-                if self.reader_obj.read_done:
-                    print("Borrando datos anterioes...")
-                    self.reader_obj.reset_all_r()
-                    print("Escriba una ruta específica:")
-                    root = input()
-                    if root == "":
-                        print("Dirección vacía.")
-                        print("")
-                    else:
-                        self.reader_obj.file_root = root
-                        if self.reader_obj.read_file():
-                            print("Carga realizada exitosamente.")
-                            print("")
-                            self.reader_obj.read_done = True
-                            self.reader_obj.proces_file_2()
-            elif selected_option_l == 2:
-                if self.reader_obj.read_done:
-                    print("Borrando datos anterioes...")
-                    self.reader_obj.reset_all_r()
-
-                print("Elija el archivo para cargarlo:")
-
-                if self.reader_obj.open_a_file():
-                    if self.reader_obj.read_file():
-                        print("Carga realizada exitosamente.")
-                        print("")
-                        self.reader_obj.read_done = True
-                        self.reader_obj.proces_file_2()                                
-                        back = True
-            else:
-                print("La opción no es válida, intente de nuevo.")
-                print("")  
+            if self.reader_obj.open_a_file():
+                if self.reader_obj.read_file():
+                    print(" *** Carga realizada exitosamente.")
+                    print("")
+                    self.reader_obj.proces_file_2()            
         elif submenu_option_1 == 3: # Creación de empresa (manual)
             print("Se creará una empresa.")
-        elif submenu_option_1 == 4: # Limpieza de las estructuras
-            print("Se limpiará el sistema...")            
-            self.reader_obj.reset_all_r()
-            print("*** Sistema limpio.")
-        elif submenu_option_1 == 5: # Volver a menú principal.
+        elif submenu_option_1 == 4: # Aplicación de configuraciones.
+            print("")
+            print("     ¯¨'*•~-.¸¸,.-~*'[ Aplicación de Configuraciones ]¯¨'*•~-.¸¸,.-~*'")
+            print("")
+            if self.reader_obj.saved_settings != None:
+                self.mostrar_conf_disponibles()
+            else:
+                print(" (!) No se han cargado configuraciones.")
+                print("")
+            
+        elif submenu_option_1 == 5: # Limpieza de las estructuras
+            print(" *** Se limpiará el sistema de evaluación actual...")            
+            self.to_test_company = None
+            self.to_test_point = None
+            print(" *** Datos reiniciados.")
+            print("")
+        elif submenu_option_1 == 6: # Volver a menú principal.
             print(" Volviendo al menú principal...")
             print("")
  
@@ -219,6 +168,40 @@ class Menu:
                 print("")
             break
 
+    def mostrar_conf_disponibles(self):        
+        while True:
+            n = 1
+            temp = self.reader_obj.saved_settings.first
+            
+            while temp != None:
+                print(" [" + str(n) + "] " + temp.id)
+                temp = temp.next
+                n += 1
+            print(" [0] Volver sin seleccionar")
+
+            print("")
+            print("Escriba el número correspondiente a la configuración para aplicar:")
+
+            p_option = 0
+            try:
+                p_option = int(input())
+            except:
+                print("Opción no válida, ingrese un número.")
+                continue
+
+            total_settings = self.reader_obj.saved_settings.cant
+            if p_option <= total_settings and p_option != 0:
+                p_selected = self.reader_obj.saved_settings.buscar_por_posicion(p_option)
+                print(" *** Se ha seleccionado a la configuración:")
+                print("     ID: " + p_selected.id)
+                data = self.reader_obj.list_of_processed_companies
+                p_selected.apply(data)
+                print("")
+            elif p_option == 0:
+                print(" Volviendo al menú principal...")
+                break
+            break
+
     def iniciar_menu(self):
         print("")
         while(self.exit == False):
@@ -271,10 +254,74 @@ class Menu:
                         print(" *** No se ha seleccionado una empresa y punto de atención para realizar las pruebas.")
                         print("")
 
-                elif submenu_selected_option_3 == 2:
-                    print("submenu 3 opción 2")
-                elif submenu_selected_option_3 == 3:
-                    print("submenu 3 opción 3")
+                elif submenu_selected_option_3 == 2: # Activar escritorio
+                    if self.to_test_company != None and self.to_test_point != None:
+                        print(" --- Escritorios inactivos actualmente:")
+                        print("")
+                        list = self.to_test_point.desk_list
+                        list.mostrar_inactivos()                        
+                        print("")
+                        print(" - Escriba el número correspondiente al escritorio para activar:")
+
+                        selected_desk = 0
+                        try:
+                            selected_desk = int(input())
+                        except:
+                            print(" (!) Opción no válida.")
+                            selected_desk = 0
+
+                        list.contar_todos()
+                        unactive_n = list.unactive_n
+
+                        if selected_desk > 0 and selected_desk <= unactive_n:
+                            desk_to_active = list.buscar_inactivo(selected_desk)
+                            if desk_to_active != None:
+                                desk_to_active.set_state(True)
+                            else:
+                                print("Ha ocurrido un error en la activación.")
+                            print("")
+                        elif selected_desk == 0:
+                            print("")
+                        else:
+                            print(" (!) Opción fuera de rango.")
+                            print("")
+                    else:
+                        print(" *** No se ha seleccionado una empresa y punto de atención para realizar las pruebas.")
+                        print("")
+                elif submenu_selected_option_3 == 3: # Desactivar escritorio
+                    if self.to_test_company != None and self.to_test_point != None:
+                        print(" --- Escritorios activos actualmente:")
+                        print("")
+                        list = self.to_test_point.desk_list
+                        list.mostrar_activos()                        
+                        print("")
+                        print(" - Escriba el número correspondiente al escritorio para desactivar:")
+
+                        selected_desk = 0
+                        try:
+                            selected_desk = int(input())
+                        except:
+                            print(" (!) Opción no válida.")
+                            selected_desk = 0
+
+                        list.contar_todos()
+                        active_n = list.active_n
+
+                        if selected_desk > 0 and selected_desk <= active_n:
+                            desk_to_deactive = list.buscar_activo(selected_desk)
+                            if desk_to_deactive != None:
+                                desk_to_deactive.set_state(False)
+                            else:
+                                print("Ha ocurrido un error en la desactivación.")
+                            print("")
+                        elif selected_desk == 0:
+                            print("")
+                        else:
+                            print(" (!) Opción fuera de rango.")
+                            print("")
+                    else:
+                        print(" *** No se ha seleccionado una empresa y punto de atención para realizar las pruebas.")
+                        print("")
                 elif submenu_selected_option_3 == 4:
                     print("submenu 3 opción 4")
                 elif submenu_selected_option_3 == 5:
