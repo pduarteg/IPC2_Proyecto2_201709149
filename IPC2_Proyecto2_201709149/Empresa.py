@@ -1,5 +1,7 @@
 class Empresa:
 	
+	next = None
+	
 	def __init__(self, id, name, abbreviation, point_list, transaction_list):
 		self.id = id
 		self.name = name
@@ -9,7 +11,7 @@ class Empresa:
 
 	def imprimir_datos_de_empresa(self):
 		print("---------------------------------------------------------------------")
-		print("Id: " + self.id)
-		print("Nombre: " + self.name)		
-		print("Abreviatura:" + self.abbreviation)
+		print(" Id: " + self.id)
+		print(" Nombre: " + self.name)		
+		print(" Abreviatura:" + self.abbreviation)
 		print("---------------------------------------------------------------------")

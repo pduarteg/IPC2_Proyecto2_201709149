@@ -6,10 +6,15 @@ import Lista_empresas
 import Lista_puntos
 import Lista_escritorios
 import Lista_transacciones
+import Lista_clientes
+import Lista_configuraciones
+
 import Empresa
 import Punto
 import Escritorio
 import Transaccion
+import Cliente
+import Configuracion
 
 class Lector:
 
@@ -19,6 +24,7 @@ class Lector:
     procesed_data = False
 
     list_of_processed_companies = None
+    saved_settings = None
 
     def open_a_file(self):
         print("Se cargará un archivo...")
@@ -56,8 +62,7 @@ class Lector:
         if self.procesed_data == False:
 
             print("Procesando información de empresas...")
-            print("")
-            self.list_of_processed_companies = Lista_empresas.Lista_empresas()
+            print("")            
             lista_de_empresas = self.file.getElementsByTagName("empresa")        
             cant_empresas = len(lista_de_empresas)
 
@@ -111,7 +116,7 @@ class Lector:
                         tr_id = transaction_i.attributes["id"].value
                         tr_name = transaction_i.getElementsByTagName("nombre")[0].childNodes[0].data
                         tr_a_time = transaction_i.getElementsByTagName("tiempoAtencion")[0].childNodes[0].data
-                        new_transaction = Transaccion.Transaccion(tr_id, tr_name, tr_a_time)
+                        new_transaction = Transaccion.Transaccion(tr_id, tr_name, tr_a_time, None)
                         new_transaction_list.add(new_transaction)
 
                     new_company = Empresa.Empresa(id, name, abb, new_point_list, new_transaction_list)
@@ -122,6 +127,80 @@ class Lector:
                 print("")
                 self.procesed_data = True
                 print("Información de empresas procesada correctamente.")
+                print("")
+            else:
+                print("")
+                print("No se han encontrado empresas.")
+                print("")
+        else:
+            print("Ya se han procesado los datos para el actual archivo cargado en memoria.")
+            print("")
+
+
+    def proces_file_2(self):
+        if self.procesed_data == False:
+
+            print("Procesando información de configuraciones...")
+            print("")            
+            config_list = self.file.getElementsByTagName("listadoInicial")[0]
+            config_list = config_list.getElementsByTagName("configInicial")
+            cant_config = len(config_list)
+
+            if cant_config != 0:
+
+                for i in range(cant_config):
+                    print("Obteniendo información de la configuración: #" + str(i+1) + "...")
+                    print("     Verificando datos iniciales...")
+
+                    id = ""
+                    company_id = ""
+                    point_id = ""                    
+
+                    try:
+                        config_id = config_list[i].attributes["id"].value
+                        company_id = config_list[i].attributes["idEmpresa"].value
+                        point_id = config_list[i].attributes["idPunto"].value
+                    except:
+                        print("     No se han encontrado los atributos requerridos para la configuración. ")
+                        print("     La configuración será omitida.")
+                        continue
+
+                    desk_list = config_list[i].getElementsByTagName("escritoriosActivos")[0]
+                    desk_list = desk_list.getElementsByTagName("escritorio")
+                    new_desk_list = Lista_escritorios.Lista_escritorios()
+
+                    for desk_i in desk_list:
+                        desk_id = desk_i.attributes["idEscritorio"].value
+                        new_desk = Escritorio.Escritorio(desk_id, None, None)
+                        new_desk_list.add(new_desk)
+
+                    client_list = config_list[i].getElementsByTagName("listadoClientes")[0]
+                    client_list = client_list.getElementsByTagName("cliente")
+                    new_client_list = Lista_clientes.Lista_clientes()
+
+                    for client_i in client_list:
+                        dpi = client_i.attributes["dpi"].value
+                        client_name = client_i.getElementsByTagName("nombre")[0].childNodes[0].data
+                        client_transactions = client_i.getElementsByTagName("listadoTransacciones")[0]
+                        client_transactions = client_transactions.getElementsByTagName("transaccion")
+                        new_transaction_list = Lista_transacciones.Lista_transacciones()
+
+                        for tran_i in client_transactions:
+                            tran_id = tran_i.attributes["idTransaccion"].value
+                            tran_cant = tran_i.attributes["cantidad"].value
+                            new_tran = Transaccion.Transaccion(tran_id, None, None, tran_cant)
+                            new_transaction_list.add(new_tran)
+
+                        new_client = Cliente.Cliente(dpi, client_name, new_transaction_list)
+                        new_client_list.add(new_client)
+
+                    new_config = Configuracion.Configuracion(id, company_id, point_id, new_desk_list, new_client)
+                    if self.saved_settings == None:
+                        self.saved_settings = Lista_configuraciones.Lista_configuraciones()
+                    self.saved_settings.add(new_config)
+                
+                print("")                
+                print("Información de configuraciones procesada correctamente.")
                 print("")
             else:
                 print("")
