@@ -43,3 +43,9 @@ class Lista_clientes:
 		for i in range(pos-1):
 			actual = actual.next
 		return actual
+
+	def take_next_client(self):
+		client = self.first
+		self.first = self.first.next
+		self.cant -= 1
+		return client

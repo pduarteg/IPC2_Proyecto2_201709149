@@ -192,7 +192,7 @@ class Lector:
                         new_client = Cliente.Cliente(dpi, client_name, new_transaction_list)
                         new_client_list.add(new_client)
 
-                    new_config = Configuracion.Configuracion(config_id, company_id, point_id, new_desk_list, new_client)
+                    new_config = Configuracion.Configuracion(config_id, company_id, point_id, new_desk_list, new_client_list)
                     if self.saved_settings == None:
                         self.saved_settings = Lista_configuraciones.Lista_configuraciones()
                     self.saved_settings.add(new_config)

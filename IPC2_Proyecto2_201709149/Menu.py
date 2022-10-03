@@ -1,6 +1,10 @@
 import Lector as LectorClass
 import Escritor as WriterClass
 
+import Lista_clientes
+import Cliente
+import Simulator
+
 import sys
 from tkinter import filedialog
 from tkinter import *
@@ -11,10 +15,7 @@ class Menu:
 
     reader_obj = LectorClass.Lector()
     escritor_obj = WriterClass.Escritor()
-
-    # Variables de la simulación
-    to_test_company = None
-    to_test_point = None
+    sim_obj = Simulator.Simulator()
 
     def __init__(self, exit):
         self.exit = exit
@@ -31,15 +32,6 @@ class Menu:
         print("     [6] Salir.")
         print("")
         print(" Escriba el número de acuerdo a la opción que desee: ")
-
-    def imprimir_menu_de_carga(self):
-        print("")
-        print(" ---------------- Carga de archivos: ----------------")
-        print("")
-        print(" [1] Escribir dirección")
-        print(" [2] Seleccionar archivo")
-        print("")
-        print("Escriba el número de acuerdo a la opción que desee: ")
 
     def print_submenu_1(self):
         print("")
@@ -79,7 +71,9 @@ class Menu:
                     print("")
                     self.reader_obj.proces_file_2()            
         elif submenu_option_1 == 3: # Creación de empresa (manual)
-            print("Se creará una empresa.")
+            print("")
+            print("     ¯¨'*•~-.¸¸,.-~*'[ Creación de empresa ]¯¨'*•~-.¸¸,.-~*'")
+            print("")
         elif submenu_option_1 == 4: # Aplicación de configuraciones.
             print("")
             print("     ¯¨'*•~-.¸¸,.-~*'[ Aplicación de Configuraciones ]¯¨'*•~-.¸¸,.-~*'")
@@ -92,8 +86,7 @@ class Menu:
             
         elif submenu_option_1 == 5: # Limpieza de las estructuras
             print(" *** Se limpiará el sistema de evaluación actual...")            
-            self.to_test_company = None
-            self.to_test_point = None
+            self.sim_obj.reset_all()
             print(" *** Datos reiniciados.")
             print("")
         elif submenu_option_1 == 6: # Volver a menú principal.
@@ -127,7 +120,7 @@ class Menu:
                 print("Se ha seleccionado a la empresa:")
                 p_selected.imprimir_datos_de_empresa()
 
-                self.to_test_company = p_selected
+                self.sim_obj.to_test_company = p_selected
                 print("")
                 self.mostrar_puntos_disponibles(p_selected)
                 print("")
@@ -162,7 +155,7 @@ class Menu:
                 print(" *** Se ha seleccionado al punto:")
                 p_selected.imprimir_datos_de_punto()
 
-                self.to_test_point = p_selected
+                self.sim_obj.to_test_point = p_selected
                 print("")
                 print(" *** Preparación para prueba completada.")
                 print("")
@@ -196,6 +189,7 @@ class Menu:
                 print("     ID: " + p_selected.id)
                 data = self.reader_obj.list_of_processed_companies
                 p_selected.apply(data)
+                self.sim_obj.to_test_setting = p_selected
                 print("")
             elif p_option == 0:
                 print(" Volviendo al menú principal...")
@@ -248,17 +242,50 @@ class Menu:
 
                 if submenu_selected_option_3 == 1:
                     print("submenu 3 opción 1")
-                    if self.to_test_company != None and self.to_test_point != None:
-                        print("[PENDIENTE] ESTADO DEL PUNTO Y EMPRESA")
+                    if self.sim_obj.to_test_company != None and self.sim_obj.to_test_point != None:
+                        if self.sim_obj.to_test_setting != None:
+                            print("     ¯¨'*•~-.¸¸,.-~*'[ Estado del punto de atención ]¯¨'*•~-.¸¸,.-~*'")
+                            print("")
+
+                            # Estado del punto de atención
+                            print(" Punto de simulación actual: ")
+                            self.sim_obj.to_test_point.imprimir_datos_de_punto()
+                            print("")
+                            self.sim_obj.to_test_point.desk_list.contar_todos()
+                            active_n = self.sim_obj.to_test_point.desk_list.active_n
+                            unactive_n = self.sim_obj.to_test_point.desk_list.unactive_n
+                            print(" Cantidad de escritorios de servicio activos: " + str(active_n))
+                            print(" Cantidad de escritorios de servicio inactivos: " + str(unactive_n))
+                            
+                            if self.sim_obj.to_test_client_list.cant != 0:
+                                print(" Clientes en espera: ")
+                                print("")
+                                t = self.sim_obj.to_test_client_list.first
+                                while t != None:
+                                    print("     " + t.name)
+                                    t = t.next
+                            else:
+                                print(" Sin clientes en espera.")
+
+                            print("")
+                            # Estado del escritorio
+                            temp = self.sim_obj.to_test_point.desk_list.first
+                            while temp != None:
+                                if temp.state:
+                                    temp.print_desk_state()
+                                temp = temp.next
+                            print("")
+                        else:
+                            print(" (!) No se ha iniciado una simulación.")
                     else:
                         print(" *** No se ha seleccionado una empresa y punto de atención para realizar las pruebas.")
                         print("")
 
                 elif submenu_selected_option_3 == 2: # Activar escritorio
-                    if self.to_test_company != None and self.to_test_point != None:
+                    if self.sim_obj.to_test_company != None and self.sim_obj.to_test_point != None:
                         print(" --- Escritorios inactivos actualmente:")
                         print("")
-                        list = self.to_test_point.desk_list
+                        list = self.sim_obj.to_test_point.desk_list
                         list.mostrar_inactivos()                        
                         print("")
                         print(" - Escriba el número correspondiente al escritorio para activar:")
@@ -289,10 +316,10 @@ class Menu:
                         print(" *** No se ha seleccionado una empresa y punto de atención para realizar las pruebas.")
                         print("")
                 elif submenu_selected_option_3 == 3: # Desactivar escritorio
-                    if self.to_test_company != None and self.to_test_point != None:
+                    if self.sim_obj.to_test_company != None and self.sim_obj.to_test_point != None:
                         print(" --- Escritorios activos actualmente:")
                         print("")
-                        list = self.to_test_point.desk_list
+                        list = self.sim_obj.to_test_point.desk_list
                         list.mostrar_activos()                        
                         print("")
                         print(" - Escriba el número correspondiente al escritorio para desactivar:")
@@ -327,8 +354,21 @@ class Menu:
                 elif submenu_selected_option_3 == 5:
                     print("submenu 3 opción 5")
                 elif submenu_selected_option_3 == 6:
-                    print("submenu 3 opción 6")
-
+                    if self.sim_obj.to_test_setting != None:
+                        print(" *** Inicializando la simulación...")
+                        print(" *** Cargando lista de espera...")
+                        lista_de_espera = Lista_clientes.Lista_clientes()
+                        t_client = self.sim_obj.to_test_setting.client_list.first
+                        while t_client != None:
+                            new_client = Cliente.Cliente(t_client.dpi, t_client.name, t_client.transactions_list)
+                            lista_de_espera.add(new_client)
+                            t_client = t_client.next
+                        self.sim_obj.to_test_client_list = lista_de_espera
+                        print(" *** Carga realizada.")
+                        print(" *** Preparación de simulación completa.")
+                    else:
+                        print(" (!) No se ha aplicado una configuración inicial.")
+                        print("")
             elif selected_option == 4:
                 print("menu 4")
             elif selected_option == 5:

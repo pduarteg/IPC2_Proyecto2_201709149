@@ -10,7 +10,8 @@ class Configuracion:
 		self.client_list = client_list
 
 	def apply(self, data):
-		print(" Aplicando congiruación: " + self.id)
+		print("")
+		print(" *** Aplicando congiruación: " + self.id)		
 		print(" *** Buscando empresa...")
 		if data != None:
 			company = data.buscar_por_id(self.idCompany)
