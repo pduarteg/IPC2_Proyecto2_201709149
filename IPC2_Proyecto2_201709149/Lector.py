@@ -214,3 +214,130 @@ class Lector:
         self.list_of_processed_companies = None
         self.procesed_data = False
         self.piso_calculado = None
+
+    def create_new_company(self):
+        print(" A continuación se solicita la información para la creación de una empresa:")
+        print("     - Escriba el ID para la nueva empresa:")
+        id = input()
+        print("     - Escriba el nombre:")
+        name = input()
+        print("     - Escriba la abreviatura:")
+        abb = input()
+
+        # Datos de puntos de atención
+        print("     - A continuación se solicita la información para los puntos de atención:")
+        new_point_list = Lista_puntos.Lista_puntos()
+        morePoints = True
+        while morePoints:
+            print("     - ¿Agregar un punto de atención a la empresa: " + name + "?")
+            print("     - Escriba '1' para agregar puntos, '0' para no agregar.")
+            optionP = 0
+            try:
+                optionP = int(input())
+            except:
+                print("     - Opción no válida.")
+                continue
+
+            if optionP == 1:
+                print("     - Escriba el ID para el punto de atención:")
+                p_id = input()
+                print("     - Escriba el nombre para el punto de atención:")
+                p_name = input()
+                print("     - Escriba la dirección para el punto de atención:")
+                p_dir = input()
+
+                # Datos de escritorios del punto
+                print("     - A continuación se solicita la información de los escritorios:")
+                new_desk_list = Lista_escritorios.Lista_escritorios()
+                moreDesks = True
+                while moreDesks:
+                    print("     - ¿Agregar un escritorio al punto: " + p_name + "?")
+                    print("     - Escriba '1' para agregar escritorios, '0' para no agregar.")
+                    optionD = 0
+                    try:
+                        optionD = int(input())
+                    except:
+                        print("     - Opción no válida.")
+                        continue
+
+                    if optionD == 1:
+                        print("")
+                        print("     - Escriba el ID para el escritorio de servicio:")
+                        d_id = input()
+                        print("     - Escriba la identificación para el escritorio de servicio:")
+                        d_ident = input()
+                        print("     - Escriba el nombre del encargado para el escritorio de servicio:")
+                        d_man = input()
+
+                        new_desk = Escritorio.Escritorio(d_id, d_ident, d_man)
+                        new_desk_list.add(new_desk)
+                        print("")
+                        print(" *** Escritorio creado correctamente.")
+                        print("")
+                    elif optionD == 0:
+                        if new_desk_list.cant == 0:
+                            print("     - (!) Debe agregar al menos un escritorio de servicio.")
+                            continue
+                        else:
+                            print("")
+                            moreDesks = False
+                    else:
+                        print("     - Opción no válida.")
+                        continue
+                new_point = Punto.Punto(p_id, p_name, p_dir, new_desk_list)
+                new_point_list.add(new_point)
+                print("")
+                print(" *** Punto de atención creado correctamente.")
+                print("")
+            elif optionP == 0 and new_point_list.cant == 0: 
+                print("     - (!) Debe agregar al menos un punto de atención.")
+                continue
+            elif optionP == 0:
+                print("")
+                morePoints = False
+            else:
+                print("     - Opción no válida.")
+                print("")
+
+        # Datos de transacciones
+        print("     - A continuación se solicita la información para las transacciones de la empresa:")
+        new_transaction_list = Lista_transacciones.Lista_transacciones()
+        moreTrns = True
+        while moreTrns:
+            print("     - ¿Agregar una transacción a la empresa: " + name + "?")
+            print("     - Escriba '1' para agregar transacciones, '0' para no agregar.")
+            optionT = 0
+            try:
+                optionT = int(input())
+            except:
+                print("     - Opción no válida.")
+                continue
+
+            if optionT == 1:
+                print("     - Escriba el ID para la transacción:")
+                t_id = input()
+                print("     - Escriba el nombre para la transacción:")
+                t_name = input()
+                print("     - Escriba el tiempo que toma atender la transacción:")
+                t_a_time = input()
+                new_tran = Transaccion.Transaccion(t_id, t_name, t_a_time, None)
+                new_transaction_list.add(new_tran)
+                print(" *** Se ha agregado la transacción.")
+                print("")
+            elif optionT == 0 and new_transaction_list.cant == 0:
+                print("     - (!) Debe agregar al menos una tarnsacción.")
+                continue
+            elif optionT == 0:
+                print("")
+                moreTrns = False
+            else:
+                print("     - Opción no válida.")
+                print("")
+
+        # Guardado de datos
+        print(" *** Guardando datos...")
+        if self.list_of_processed_companies == None:
+            self.list_of_processed_companies = Lista_empresas.Lista_empresas()
+        new_company = Empresa.Empresa(id, name, abb, new_point_list, new_transaction_list)
+        print(" *** Se ha creado la empresa:")
+        new_company.imprimir_datos_de_empresa()

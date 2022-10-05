@@ -9,18 +9,19 @@ class Simulator:
     to_test_company = None
     to_test_point = None
     to_test_setting = None
-    to_test_client_list = None # cola
+    to_test_client_list = None # Cola de la simulación
 
     disp_client_list = None # Clientes que pueden usarse para la simulación
     test_initialized = False
 
     clients_in = 0 # Cantidad de clientes que han ingresado
-    clients_done = 0 # Cantidad de clientes ya atendidos
+    clients_out = 0 # Cantidad de clientes ya atendidos
 
     point_total_wait_time = 0
     point_min_wait_time = 0
     point_max_wait_time = 0
     point_med_time = 0
+    point_med_a_time = 0
     point_min_a_time = 0
     point_max_a_time = 0
 
@@ -34,7 +35,7 @@ class Simulator:
         self.to_test_client_list = None
 
         self.clients_in = 0
-        self.clients_done = 0
+        self.clients_out = 0
 
         self.point_total_wait_time = 0
         self.point_min_wait_time = 0
@@ -55,34 +56,59 @@ class Simulator:
             temp.a_client = None
             temp = temp.next
 
-        # Asignando clientes a escritorios
+        # Asignando clientes a escritorios / atendiendo clientes.
         temp = list.first
         while temp != None:
             if temp.state == True:
                 if self.to_test_client_list.cant > 0:
                     client = self.to_test_client_list.take_next_client()
                     temp.a_client = client
-                    print(" Asignando el cliente: " + client.name + ", al escritorio: " + temp.id)
-                    print(" Atención en proceso...")
+                    print(" *** Asignando el cliente: " + client.name + ", al escritorio: " + temp.id)
+                    print(" *** Atención en proceso...")
                     # Cálculo de tiempos:
 
-                        # Tiempo medio de atención:
                     temp.total_clients_a += 1
+                        # Tiempo medio de atención del escritorio:                    
                     temp.total_a_time += client.atention_time
                     temp.med_time = temp.total_a_time / temp.total_clients_a
-                        # Tiempo mínimo de atención:
+
+                        # Tiempo mínimo de atención escritorio y punto:
                     if temp.min_a_time == None:
                         temp.min_a_time = client.atention_time
                     elif client.atention_time < temp.min_a_time:
                         temp.min_a_time = client.atention_time
-                        # Tiempo máximo de atención:
+                    if self.point_min_a_time == 0:
+                        self.point_min_a_time = client.atention_time
+                    elif client.atention_time < self.point_min_a_time:
+                        self.point_min_a_time = client.atention_time
+                    self.to_test_point.min_a_time = self.point_min_a_time
+
+                        # Tiempo máximo de atención escritorio y punto:
                     if temp.max_a_time == None:
                         temp.max_a_time = client.atention_time
                     elif client.atention_time > temp.max_a_time:
                         temp.max_a_time = client.atention_time
+                    if self.point_max_a_time == 0:
+                        self.point_max_a_time = client.atention_time
+                    elif client.atention_time > self.point_max_a_time:
+                        self.point_max_a_time = client.atention_time
+                    self.to_test_point.max_a_time = self.point_max_a_time
+
+                    self.clients_out += 1
+
             temp = temp.next
 
+        
+        # Cálculo del tiempo medio de atención del punto:
+        print(" *** Calculando tiempos del punto de atención...")
+        self.calculate_med_atention_time()
+        self.to_test_point.med_a_time = self.point_med_a_time
+        print(" *** Atención finalizada.")
+
     def initialize_test(self):
+        # Reseteando información de pruebas anteriores
+        self.to_test_point.reset_sim_data()
+
         # Crea la cola vacía
         self.to_test_client_list = Lista_clientes.Lista_clientes()        
 
@@ -107,7 +133,7 @@ class Simulator:
         client.atention_time = a
         print(" *** El cliente: " + client.name + ", tomará en atenderse: " + str(a) + " minutos.")
 
-    def request_service(self):
+    def request_service(self):        
         while True:
             print("")
             print(" *** Clientes disponibles para la prueba: ")
@@ -175,12 +201,27 @@ class Simulator:
                     self.disp_client_list.delete_client(new_client.dpi)
                     print(" *** Se ha agregado al cliente: " + new_client.name +  " a la cola de atención.")
 
-                    # Cálculo del tiempo
+                    # Cálculo de tiempos de espera:
                     self.calculate_client_atention_time(new_client)                    
                     self.clients_in += 1
                     self.point_med_time = self.point_total_wait_time / self.clients_in
                     print(" *** El tiempo medio de espera para el cliente es: " + str(self.point_med_time) + " minutos.")
                     self.point_total_wait_time += new_client.atention_time
+
+                    if self.point_min_wait_time == 0:
+                        self.point_min_wait_time = self.point_med_time
+                    elif self.point_med_time < self.point_min_wait_time:
+                        self.point_min_wait_time = self.point_med_time
+
+                    if self.point_max_wait_time == 0:
+                        self.point_max_wait_time = self.point_med_time
+                    elif self.point_med_time > self.point_max_wait_time:
+                        self.point_max_wait_time = self.point_med_time
+
+                    # Agregando tiempos al punto:
+                    self.to_test_point.med_wait_time = self.point_med_time
+                    self.to_test_point.min_wait_time = self.point_min_wait_time
+                    self.to_test_point.max_wait_time = self.point_max_wait_time
                     print("")
                     break                    
                 else:
@@ -188,3 +229,13 @@ class Simulator:
             else:
                 print(" (!) Selección no válida, intente de nuevo.")
                 print("")
+
+    def calculate_med_atention_time(self):
+        temp = self.to_test_point.desk_list.first
+        total_time = 0
+
+        while temp != None:
+            total_time += temp.total_a_time
+            temp = temp.next
+
+        self.point_med_a_time = total_time / self.clients_in
