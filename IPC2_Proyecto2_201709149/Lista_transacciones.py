@@ -38,8 +38,36 @@ class Lista_transacciones:
 
 		return r_transaccion
 
+	def buscar_por_id(self, id):
+		r_transaccion = None
+		temp = self.first
+
+		while temp != None:
+			if temp.id == id:
+				r_transaccion = temp
+				break
+			else:
+				temp = temp.next
+
+		return r_transaccion
+
 	def buscar_por_posicion(self, pos):
 		actual = self.first
 		for i in range(pos-1):
 			actual = actual.next
 		return actual
+
+	def delete_transaction(self, id):
+		temp = self.first
+		aux = None
+		while temp != None:			
+			if temp == self.first:
+				self.first = self.first.next
+				self.cant -= 1
+				break
+			elif temp.dpi == id:
+				aux.next = temp.next
+				self.cant -= 1
+				break
+			aux = aux.next
+			temp = temp.next

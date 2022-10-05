@@ -243,7 +243,7 @@ class Menu:
                 if submenu_selected_option_3 == 1:
                     print("submenu 3 opción 1")
                     if self.sim_obj.to_test_company != None and self.sim_obj.to_test_point != None:
-                        if self.sim_obj.to_test_setting != None:
+                        if self.sim_obj.to_test_setting != None and self.sim_obj.test_initialized:
                             print("     ¯¨'*•~-.¸¸,.-~*'[ Estado del punto de atención ]¯¨'*•~-.¸¸,.-~*'")
                             print("")
 
@@ -262,12 +262,15 @@ class Menu:
                                 print("")
                                 t = self.sim_obj.to_test_client_list.first
                                 while t != None:
-                                    print("     " + t.name)
+                                    print("     - Nombre: " + t.name + ", DPI: " + t.dpi)
                                     t = t.next
                             else:
                                 print(" Sin clientes en espera.")
-
+                            
                             print("")
+                            print(" Estado de los escritorios:")
+                            print("")
+
                             # Estado del escritorio
                             temp = self.sim_obj.to_test_point.desk_list.first
                             while temp != None:
@@ -277,6 +280,7 @@ class Menu:
                             print("")
                         else:
                             print(" (!) No se ha iniciado una simulación.")
+                            print("")
                     else:
                         print(" *** No se ha seleccionado una empresa y punto de atención para realizar las pruebas.")
                         print("")
@@ -350,22 +354,27 @@ class Menu:
                         print(" *** No se ha seleccionado una empresa y punto de atención para realizar las pruebas.")
                         print("")
                 elif submenu_selected_option_3 == 4:
-                    print("submenu 3 opción 4")
+                    if self.sim_obj.test_initialized:
+                        if self.sim_obj.to_test_client_list.first != None:
+                            print(" *** Atendiendo clientes en cola...")
+                            self.sim_obj.finish_service()
+                        else:
+                            print(" *** No hay clientes por atender.")
+                    else:
+                        print(" (!) No se ha iniciado una simulación.")
                 elif submenu_selected_option_3 == 5:
-                    print("submenu 3 opción 5")
+                    if self.sim_obj.test_initialized:
+                        print("     ¯¨'*•~-.¸¸,.-~*'[ Solicitud de atención ]¯¨'*•~-.¸¸,.-~*'")
+                        self.sim_obj.request_service()
+                    else:
+                        print(" (!) No se ha iniciado una simulación.")
+                        print("")
                 elif submenu_selected_option_3 == 6:
                     if self.sim_obj.to_test_setting != None:
-                        print(" *** Inicializando la simulación...")
-                        print(" *** Cargando lista de espera...")
-                        lista_de_espera = Lista_clientes.Lista_clientes()
-                        t_client = self.sim_obj.to_test_setting.client_list.first
-                        while t_client != None:
-                            new_client = Cliente.Cliente(t_client.dpi, t_client.name, t_client.transactions_list)
-                            lista_de_espera.add(new_client)
-                            t_client = t_client.next
-                        self.sim_obj.to_test_client_list = lista_de_espera
-                        print(" *** Carga realizada.")
-                        print(" *** Preparación de simulación completa.")
+                        print(" *** Inicializando la simulación...")                        
+                        self.sim_obj.initialize_test()
+                        print(" *** Simulación inicializada.")
+                        print("")
                     else:
                         print(" (!) No se ha aplicado una configuración inicial.")
                         print("")

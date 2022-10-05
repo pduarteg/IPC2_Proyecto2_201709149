@@ -49,3 +49,18 @@ class Lista_clientes:
 		self.first = self.first.next
 		self.cant -= 1
 		return client
+
+	def delete_client(self, dpi):
+		temp = self.first
+		aux = None
+		while temp != None:			
+			if temp == self.first:
+				self.first = self.first.next
+				self.cant -= 1
+				break
+			elif temp.dpi == dpi:
+				aux.next = temp.next
+				self.cant -= 1
+				break
+			aux = aux.next
+			temp = temp.next
