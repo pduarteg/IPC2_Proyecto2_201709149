@@ -40,3 +40,8 @@ class Escritorio:
 			print("       Cantidad de clientes atendidos por este escritorio: " + str(self.total_clients_a))
 		else:
 			print("       Este escritorio aún no ha atendido clientes.")
+
+	def round_values(self):
+		self.med_time = round(self.med_time, 2)
+		self.min_a_time = round(self.min_a_time, 2)
+		self.max_a_time = round(self.max_a_time, 2)

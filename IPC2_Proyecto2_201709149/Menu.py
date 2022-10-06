@@ -251,6 +251,8 @@ class Menu:
                             if self.sim_obj.to_test_setting != None and self.sim_obj.test_initialized:
                                 print("     ¯¨'*•~-.¸¸,.-~*'[ Estado del punto de atención ]¯¨'*•~-.¸¸,.-~*'")
                                 print("")
+                                # Redondeo de valores
+                                self.sim_obj.to_test_point.round_values()
 
                                 # Estado del punto de atención
                                 print(" Punto de simulación actual: ")
@@ -266,16 +268,16 @@ class Menu:
                                 print(" Cantidad de escritorios de servicio inactivos: " + str(unactive_n))
                                 print("")
                                 if self.sim_obj.clients_in > 0:
-                                    print(" Tiempo promedio de espera: " + str(self.sim_obj.to_test_point.med_wait_time))
-                                    print(" Tiempo máximo de espera: " + str(self.sim_obj.to_test_point.max_wait_time))
-                                    print(" Tiempo mínimo de espera: " + str(self.sim_obj.to_test_point.min_wait_time))
+                                    print(" Tiempo promedio de espera: " + str(self.sim_obj.to_test_point.med_wait_time) + " minutos.")
+                                    print(" Tiempo máximo de espera: " + str(self.sim_obj.to_test_point.max_wait_time) + " minutos.")
+                                    print(" Tiempo mínimo de espera: " + str(self.sim_obj.to_test_point.min_wait_time) + " minutos.")
                                 else:
                                     print(" Información de tiempos de espera aún no disponible.")
 
                                 if self.sim_obj.clients_out > 0:
-                                    print(" Tiempo promedio de atención: " + str(self.sim_obj.to_test_point.med_a_time))
-                                    print(" Tiempo máximo de atención: " + str(self.sim_obj.to_test_point.max_a_time))
-                                    print(" Tiempo mínimo de atención: " + str(self.sim_obj.to_test_point.min_a_time))
+                                    print(" Tiempo promedio de atención: " + str(self.sim_obj.to_test_point.med_a_time) + " minutos.")
+                                    print(" Tiempo máximo de atención: " + str(self.sim_obj.to_test_point.max_a_time) + " minutos.")
+                                    print(" Tiempo mínimo de atención: " + str(self.sim_obj.to_test_point.min_a_time) + " minutos.")
                                 else:
                                     print(" Información de tiempos de atención aún no disponible.")
                                 
@@ -285,7 +287,12 @@ class Menu:
                                     print("")
                                     t = self.sim_obj.to_test_client_list.first
                                     while t != None:
-                                        print("     - Nombre: " + t.name + ", DPI: " + t.dpi)
+                                        t.round_values()
+                                        print("     DPI: " + t.dpi)
+                                        print("       Nombre: " + t.name)
+                                        print("       Tiempo en atender transacciones: " + str(t.atention_time) + " minutos.")
+                                        print("       Tiempo de espera media: " + str(t.wait_med_time) + " minutos.")
+                                        print("")
                                         t = t.next
                                     print("")
                                     print(" Cantidad de clientes en espera: " + str(self.sim_obj.to_test_client_list.cant))
@@ -293,17 +300,21 @@ class Menu:
                                     print(" Sin clientes en espera.")
                                 print(" Cantidad de clientes atendidos: " + str(self.sim_obj.clients_out))
                                 
-                                print("")
-                                print(" Estado de los escritorios activos:")
-                                print("")
+                                if active_n > 0:
+                                    print("")
+                                    print(" Estado de los escritorios activos:")
+                                    print("")
 
-                                # Estado del escritorio
-                                temp = self.sim_obj.to_test_point.desk_list.first
-                                while temp != None:
-                                    if temp.state:
-                                        temp.print_desk_state()
-                                        print("")
-                                    temp = temp.next
+                                    # Estado del escritorio
+                                    temp = self.sim_obj.to_test_point.desk_list.first
+                                    while temp != None:
+                                        if temp.state:
+                                            temp.round_values()
+                                            temp.print_desk_state()
+                                            print("")
+                                        temp = temp.next
+                                else:
+                                    print(" No hay escritorios activos actualmente.")
                             else:
                                 print(" (!) No se ha iniciado una simulación.")
                                 print("")
@@ -381,11 +392,15 @@ class Menu:
                     elif submenu_selected_option_3 == 4: # Atender cliente
                         if self.sim_obj.test_initialized:
                             if self.sim_obj.to_test_client_list.first != None:
-                                print(" *** Atendiendo clientes en cola...")
-                                self.sim_obj.finish_service()
-                                print("")
+                                self.sim_obj.to_test_point.desk_list.contar_todos()
+                                if self.sim_obj.to_test_point.desk_list.active_n > 0:
+                                    print(" *** Atendiendo clientes en cola...")
+                                    self.sim_obj.finish_service()
+                                    print("")
+                                else:
+                                    print(" (!) No hay escritorios activos actualmente.")
                             else:
-                                print(" *** No hay clientes por atender.")
+                                print(" (!) No hay clientes por atender.")
                         else:
                             print(" (!) No se ha iniciado una simulación.")
                     elif submenu_selected_option_3 == 5: # Solicitud de atención

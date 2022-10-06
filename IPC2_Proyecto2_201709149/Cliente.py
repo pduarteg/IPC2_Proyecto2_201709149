@@ -5,7 +5,8 @@ class Cliente:
 
 	next = None
 	to_select_transactions_list = None
-	atention_time = 0 # Tiempo que tomará al cliente en atender sus transacciones
+	atention_time = 0 # Tiempo que tomará al cliente en atender sus propias transacciones.
+	wait_med_time = 0 # Tiempo promedio que le tomará esperar al cliente.
 	
 	def __init__(self, dpi, name, transactions_list):
 		self.dpi = dpi
@@ -42,3 +43,7 @@ class Cliente:
 				print(" (!) No quedan más transacciones para la prueba.")
 		else:
 			print(" (!) No hay transacciones disponibles para el cliente.")
+
+	def round_values(self):
+		self.atention_time = round(self.atention_time, 2)
+		self.wait_med_time = round(self.wait_med_time, 2)

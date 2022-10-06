@@ -220,6 +220,7 @@ class Simulator:
                     self.calculate_client_atention_time(new_client)                    
                     self.clients_in += 1
                     self.point_med_time = self.point_total_wait_time / self.clients_in
+                    new_client.wait_med_time = self.point_med_time
                     print(" *** El tiempo medio de espera para el cliente es: " + str(self.point_med_time) + " minutos.")
                     self.point_total_wait_time += new_client.atention_time
 

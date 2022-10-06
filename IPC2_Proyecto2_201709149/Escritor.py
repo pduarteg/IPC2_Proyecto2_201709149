@@ -33,7 +33,30 @@ class Escritor:
 		file.write("	label = \"" + label + "\"\n")
 		file.write("	node [shape=box color=deeppink3 style=filled fillcolor=salmon]\n")
 		file.write("\n")
-		file.write("	R1 [label=\"Punto de atencion: " + a_point.name + "\" shape=\"Mrecord\"]\n")
+
+		# Datos del punto
+		a_point.round_values()
+		a_point.desk_list.contar_todos()
+
+		R1_label = ""
+		R1_label += a_point.name + "\\n"
+		if a_point.med_wait_time > 0:
+			R1_label += "Promedio espera: " + str(a_point.med_wait_time) + " min\\n"
+		if a_point.max_wait_time > 0:
+			R1_label += "Máximo espera: " + str(a_point.max_wait_time) + " min\\n"
+		if a_point.min_wait_time > 0:
+			R1_label += "Mínimo espera: " + str(a_point.min_wait_time) + " min\\n"
+		if a_point.med_a_time > 0:
+			R1_label += "Promedio atención: " + str(a_point.med_a_time) + " min\\n"
+		if a_point.max_a_time > 0:
+			R1_label += "Máximo atención: " + str(a_point.max_a_time) + " min\\n"
+		if a_point.min_a_time > 0:
+			R1_label += "Mínimo atención: " + str(a_point.min_a_time) + " min\\n"
+		
+		R1_label += "Escritorios activos: " + str(a_point.desk_list.active_n) + "\\n"
+		R1_label += "Escritorios inactivos: " + str(a_point.desk_list.unactive_n)
+		file.write("	R1 [label=\"Punto de atencion: " + R1_label + "\" shape=\"Mrecord\"]\n")
+
 		file.write("	R2 [label=\"Clientes en espera:\" shape=\"Mrecord\"]\n")
 
 		# Escritura de escritorios
@@ -41,16 +64,20 @@ class Escritor:
 		n = 0
 		label = ""
 		while t != None:
-			if t.state and tipo == 1: # Mostrar activos				
+			if t.state and tipo == 1: # Mostrar activos
+				t.round_values()
 				label += "Escritorio: " + t.id + "\\n"
 				label += "Identificación: " + t.identification + "\\n"
 				label += "Encargado: " + t.manager + "\\n"
 				if t.min_a_time != None:
-					label += "Tiempo de atención mínimo: " + str(t.min_a_time) + "\\n"
+					if t.min_a_time > 0:
+						label += "Mínimo atención: " + str(t.min_a_time) + " min\\n"
 				if t.max_a_time != None:
-					label += "Tiempo de atención máximo: " + str(t.max_a_time) + "\\n"
-				label += "Atendidos: " + str(t.total_clients_a) + "\\n"
-				label += "Tiempo de atención medio: " + str(t.med_time)
+					if t.max_a_time > 0:
+						label += "Máximo atención: " + str(t.max_a_time) + " min\\n"
+				if t.med_time > 0:
+					label += "Promedio atención: " + str(t.med_time) + " min\\n"
+				label += "Atendidos: " + str(t.total_clients_a)
 				file.write("	D" + str(n) + " [label=\"" + label + "\"]\n")
 				n += 1
 			elif t.state == False and tipo == 2: # Mostrar inactivos
@@ -79,8 +106,11 @@ class Escritor:
 			n = 0
 			label = ""
 			while t != None:
+				t.round_values()
 				label += t.name + "\\n"
-				label += "DPI: " + t.dpi
+				label += "DPI: " + t.dpi + "\\n"
+				label += "Atención propia: " + str(t.atention_time) + " min\\n"
+				label += "Espera media: " + str(t.wait_med_time) + " min"
 				file.write("	C" + str(n) + " [label=\"" + label + "\"]\n")
 				label = ""
 				n += 1
@@ -88,8 +118,7 @@ class Escritor:
 		file.write("\n")
 
 		# Unión de los nodos escritorios
-		file.write("	{\n")
-		a_point.desk_list.contar_todos()
+		file.write("	{\n")		
 		if tipo == 1:
 			m = a_point.desk_list.active_n
 			for i in range(m):

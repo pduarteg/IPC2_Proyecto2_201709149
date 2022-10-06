@@ -1,8 +1,9 @@
 digraph Plantilla {		
 	rankdir="LR"
-	layout=dot
-	label = "Estado del punto de atencion."
+	layout=dot	
+	label = "Estado del punto y escritorios activos del punto."
 	node [shape=box color=deeppink3 style=filled fillcolor=salmon]
+	
 	R [label="Punto de atencion: NOMBRE" shape="Mrecord"]
 	a [label="Clientes en espera:" shape="Mrecord"]
 	esc1 [label="escritorio: uno \n encargado: abril \n transacciones: \n -t1 \n -t2"]
@@ -16,5 +17,5 @@ digraph Plantilla {
 		c->d;
 		d->e;
 	}
-	label = "Estado del punto y escritorios activos del punto."
+	
 }	

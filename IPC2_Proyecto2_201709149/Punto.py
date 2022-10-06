@@ -33,3 +33,11 @@ class Punto:
 		while temp != None:
 			temp.reset_sim_values()
 			temp = temp.next
+
+	def round_values(self):
+		self.med_wait_time = round(self.med_wait_time, 2)
+		self.max_wait_time = round(self.max_wait_time, 2)
+		self.min_wait_time = round(self.min_wait_time, 2)
+		self.med_a_time = round(self.med_a_time, 2)
+		self.max_a_time = round(self.max_a_time, 2)
+		self.min_a_time = round(self.min_a_time, 2)
