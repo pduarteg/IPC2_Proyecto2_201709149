@@ -4,21 +4,17 @@ digraph Estado {
 	label = "Estado del punto y escritorios activos del punto."
 	node [shape=box color=deeppink3 style=filled fillcolor=salmon]
 
-	R1 [label="Punto de atencion: punto11\nPromedio espera: 11.67 min\nMáximo espera: 11.67 min\nMínimo espera: 7.0 min\nEscritorios activos: 3\nEscritorios inactivos: 1" shape="Mrecord"]
+	R1 [label="Punto de atencion: punto11\nPromedio espera: 7.0 min\nMáximo espera: 7.0 min\nMínimo espera: 7.0 min\nEscritorios activos: 2\nEscritorios inactivos: 2" shape="Mrecord"]
 	R2 [label="Clientes en espera:" shape="Mrecord"]
 	D0 [label="Escritorio: esc11-2\nIdentificación: Ident Escritorio 11-2\nEncargado: EP1L1-2\nAtendidos: 0"]
-	D1 [label="Escritorio: esc11-3\nIdentificación: Ident Escritorio 11-3\nEncargado: EP1L1-3\nAtendidos: 0"]
-	D2 [label="Escritorio: esc11-4\nIdentificación: Ident Escritorio 11-4\nEncargado: EP1L1-4\nAtendidos: 0"]
+	D1 [label="Escritorio: esc11-4\nIdentificación: Ident Escritorio 11-4\nEncargado: EP1L1-4\nAtendidos: 0"]
 	C0 [label="Josué\nDPI: 10101010\nAtención propia: 14 min\nEspera media: 0.0 min"]
-	C1 [label="Antonio\nDPI: 30303030\nAtención propia: 21 min\nEspera media: 7.0 min"]
-	C2 [label="Maresa\nDPI: 31413141\nAtención propia: 8 min\nEspera media: 11.67 min"]
+	C1 [label="Antonio\nDPI: 30303030\nAtención propia: 15 min\nEspera media: 7.0 min"]
 
 	{
 		R1->D0
 		R1->D1
-		R1->D2
 		R2->C0
 		C0->C1
-		C1->C2
 	}
 }
