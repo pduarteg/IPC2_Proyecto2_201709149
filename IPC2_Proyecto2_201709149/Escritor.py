@@ -4,15 +4,11 @@ import os
 
 class Escritor:
 	
-	def writeDOT_G(self, name, matriz, periodo):
-		print("Graficando la matriz: ")
-		matriz.imprimir_matriz()
-		sanas = matriz.contar_sanas()
-		infectadas = matriz.filas*matriz.columnas - sanas
-		print("")
-
+	# tipo == 1: solo activos, == 2: solo inactivos, == 3: ambos.
+	def writeDOT(self, a_point, a_line, tipo):
+		print("Graficando el estado del punto de atención: ")
 		dirA = os.getcwd()
-		dirB = dirA + "\\Grafica_periodo_n_[" + str(periodo) + "]"
+		dirB = dirA + "\Estado"
 			
 		print("*** Creando gráfica en ruta específicada...")
 		try:
@@ -22,64 +18,93 @@ class Escritor:
 			print("Ruta en conflicto: " + str(dirB))
 			print("Creando gráfica en la ruta actual...")
 			dirA = os.getcwd()
-			dirB = dirA + "\\Grafica_periodo_n_[" + str(periodo) + "]"
+			dirB = dirA + "\Estado"
 			file = open(dirB, "w")
 
 		print("*** Ruta de salida: " + str(dirB))
 
 		# Inicia escritura
-		file.write("graph paciente {\n")
+		file.write("digraph Estado {\n")
 		file.write("	layout=dot\n")
-		# Etiqueta con información del periodo
-		label = "Paciente: " + name + " periodo no: " + str(periodo)
-		label += " sanas: " + str(sanas) + ", infectadas: " + str(infectadas)
+
+		# Etiqueta con información del punto de atención
+		label = "Estado del punto y escritorios activos del punto."
+		file.write("	rankdir=\"LR\"\n")
 		file.write("	label = \"" + label + "\"\n")
 		file.write("	node [shape=box color=deeppink3 style=filled fillcolor=salmon]\n")
 		file.write("\n")
+		file.write("	R1 [label=\"Punto de atencion: " + a_point.name + "\" shape=\"Mrecord\"]\n")
+		file.write("	R2 [label=\"Clientes en espera:\" shape=\"Mrecord\"]\n")
 
-		temp = None # temp es el nodo actual
-		nodo_aux = matriz.raiz.abajo
-		color = ""
+		# Escritura de escritorios
+		t = a_point.desk_list.first
+		n = 0
+		label = ""
+		while t != None:
+			if t.state and tipo == 1: # Mostrar activos				
+				label += "Escritorio: " + t.id + "\\n"
+				label += "Identificación: " + t.identification + "\\n"
+				label += "Encargado: " + t.manager + "\\n"
+				if t.min_a_time != None:
+					label += "Tiempo de atención mínimo: " + str(t.min_a_time) + "\\n"
+				if t.max_a_time != None:
+					label += "Tiempo de atención máximo: " + str(t.max_a_time) + "\\n"
+				label += "Atendidos: " + str(t.total_clients_a) + "\\n"
+				label += "Tiempo de atención medio: " + str(t.med_time)
+				file.write("	D" + str(n) + " [label=\"" + label + "\"]\n")
+				n += 1
+			elif t.state == False and tipo == 2: # Mostrar inactivos
+				label += "Escritorio: " + t.id + "\\n"
+				label += "Identificación: " + t.identification + "\\n"
+				label += "Encargado: " + t.manager + "\\n"
+				label += "Tiempo de atención medio: " + str(t.med_time)
+				file.write("	D" + str(n) + " [label=\"" + label + "\"]\n")
+				n += 1
+			elif tipo == 3:
+				label += "Escritorio: " + t.id + "\\n"
+				label += "Identificación: " + t.identification + "\\n"
+				label += "Encargado: " + t.manager + "\\n"
+				label += "Tiempo de atención medio: " + str(t.med_time)
+				file.write("	D" + str(n) + " [label=\"" + label + "\"]\n")
+				n += 1
+			label = ""
+			t = t.next
 
-		for j in range(matriz.filas):
-			temp = nodo_aux.derecha
-			for i in range(matriz.columnas):
-				if temp.estado == False:
-					color = "white"
-				else:
-					color = "black"
-				file.write("	c" + str(temp.x) + str(temp.y) + "[label=\"\" fillcolor=" + color + "]\n")
-				temp = temp.derecha
-			nodo_aux = nodo_aux.abajo
+		# Escritura de clientes
+		t = a_line.first
+		if t == None:
+			label = "Sin clientes en la cola actual"
+			file.write("	C0 [label=\"" + label + "\"]\n")
+		else:
+			n = 0
+			label = ""
+			while t != None:
+				label += t.name + "\\n"
+				label += "DPI: " + t.dpi
+				file.write("	C" + str(n) + " [label=\"" + label + "\"]\n")
+				label = ""
+				n += 1
+				t = t.next
 		file.write("\n")
-		
-		for i in range(matriz.columnas + 1): #i:columnas
-			row = ""
-			if i == 0:
-				continue
-			for j in range(matriz.filas + 1): #j:filas
-				if j == 0:
-					continue
-				if j == (matriz.filas - 1 + 1): #<- aquí filas
-					row += "c" + str(i) + str(j)
-				else:
-					row += "c" + str(i) + str(j) + " -- "
-			file.write("	" + row + "\n")
 
-		file.write("\n")
+		# Unión de los nodos escritorios
+		file.write("	{\n")
+		a_point.desk_list.contar_todos()
+		if tipo == 1:
+			m = a_point.desk_list.active_n
+			for i in range(m):
+				file.write("		R1->D" + str(i) + "\n")				
 
-		for i in range(matriz.filas + 1): #i:filas
-			if i == 0:
-				continue
-			row = ""
-			for j in range(matriz.columnas + 1): #j:columnas
-				if j == 0:
-					continue
-				if j == (matriz.columnas - 1 + 1): #<- aquí columnas
-					row += "c" + str(j) + str(i)
+		m = a_line.cant
+		if m > 0:
+			for i in range(m):
+				if i == 0:
+					file.write("		R2->C0\n")
 				else:
-					row += "c" + str(j) + str(i) + " -- "
-			file.write("	rank=same {" + row + "}\n")
+					file.write("		C"  + str(i-1) + "->C" + str(i) + "\n")
+		elif m == 0:
+			file.write("		R2->C0\n")
+		file.write("	}\n")
 		file.write("}")
 		# Doc end
 
@@ -88,61 +113,7 @@ class Escritor:
 		file.close()
 		#file = open(dirB)
 		#dirC = str(dirB)
-		#print("Se abrirá el archivo:")
-		os.system("DOT -Tsvg -O Grafica_periodo_n_[" + str(periodo) + "]")
-		#os.system("Grafica_periodo_n_[" + str(periodo) + "].svg")
+		print("Se abrirá el archivo:")
+		os.system("DOT -Tsvg -O Estado")
+		os.system("Estado.svg")
 		print("")
-
-	def graficar_secuencia(self, paciente):
-		paciente.diagnosticar(paciente.rejilla_inicial, True, True)
-		lista = paciente.lista_recorrido
-		t = lista.first
-		p = 0
-
-		print("Se imprimirán: " + str(lista.cant))
-		while t != None:
-			self.writeDOT_G(paciente.name, t, p)
-			t = t.next
-			p += 1
-
-	def write_out_XML(self, lista):
-		lista.diagnosticar_todos_los_pacientes()
-
-		dirA = os.getcwd()
-		dirB = dirA + "\\Diagnóstico_Salida.xml"
-			
-		print("*** Creando gráfica en ruta específicada...")
-		try:
-			file = open(dirB, "w")
-		except:
-			print("La ruta específicada ha producido un error.")
-			print("Ruta en conflicto: " + str(dirB))
-			print("Creando salida en la ruta actual...")
-			dirA = os.getcwd()
-			dirB = dirA + "\\Grafica"
-			file = open(dirB, "w")
-
-		print("*** Ruta de salida: " + str(dirB))
-
-		# Inicia escritura
-		file.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-		file.write("<pacientes>\n")
-		t = lista.first
-		while t != None:
-
-			file.write("	<paciente>\n")
-			file.write("		<datospersonales>\n")
-			file.write("			<nombre>" + t.name + "</nombre>\n")
-			file.write("			<edad>" + str(t.age) + "</edad>\n")
-			file.write("		</datospersonales>\n")
-			file.write("		<periodos>" + str(t.period) + "</periodos>\n")
-			file.write("		<m>" + str(t.m) + "</m>\n")
-			file.write("		<resultado>" + str(t.caso_de_enfermedad) + "</resultado>\n")
-			file.write("	</paciente>\n")
-			t = t.next
-
-		file.write("</pacientes>\n")
-		# Fin de escritura de XML		
-		file.close()
-		print("*** Escritura de XML de salida terminada.")	
-		print("")	

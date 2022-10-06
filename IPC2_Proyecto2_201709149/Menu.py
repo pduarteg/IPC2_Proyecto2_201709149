@@ -14,7 +14,7 @@ import os
 class Menu:
 
     reader_obj = LectorClass.Lector()
-    escritor_obj = WriterClass.Escritor()
+    writer_obj = WriterClass.Escritor()
     sim_obj = Simulator.Simulator()
 
     def __init__(self, exit):
@@ -27,9 +27,8 @@ class Menu:
         print("")
         print("     [1] Configuración de empresas.")
         print("     [2] Selección de empresa y punto de atención.")
-        print("     [3] Manejo de puntos de atención.")
-        print("     [4] Visualizar estructuras.")
-        print("     [6] Salir.")
+        print("     [3] Manejo de puntos de atención.")        
+        print("     [4] Salir.")
         print("")
         print(" Escriba el número de acuerdo a la opción que desee: ")
 
@@ -54,7 +53,7 @@ class Menu:
             print("Opción no válida.")
             submenu_option_1 = 0
 
-        if submenu_option_1 == 1:   # Carca de archivo ENTRADA 1
+        if submenu_option_1 == 1:   # Carga de archivo ENTRADA 1
             print(" - Elija el archivo para cargarlo:")
 
             if self.reader_obj.open_a_file():
@@ -62,7 +61,7 @@ class Menu:
                     print(" *** Carga realizada exitosamente.")
                     print("")
                     self.reader_obj.proces_file_1()
-        elif submenu_option_1 == 2: # Carca de archivo ENTRADA 2
+        elif submenu_option_1 == 2: # Carga de archivo ENTRADA 2
             print(" - Elija el archivo para cargarlo:")
 
             if self.reader_obj.open_a_file():
@@ -93,6 +92,7 @@ class Menu:
         elif submenu_option_1 == 6: # Volver al menú principal.
             print(" Volviendo al menú principal...")
             print("")
+            return True
 
     def mostrar_empresas_disponibles(self):        
         while True:
@@ -209,7 +209,10 @@ class Menu:
                 continue
 
             if selected_option == 1:
-                self.print_submenu_1()
+                while True:
+                    s = self.print_submenu_1()
+                    if s == True:
+                        break
             elif selected_option == 2: # Selección de empresa y punto de atención
                 print("")
                 print("     ¯¨'*•~-.¸¸,.-~*'[ Selección de Empresa y Punto de Atención ]¯¨'*•~-.¸¸,.-~*'")
@@ -230,7 +233,8 @@ class Menu:
                     print("     [4] Atender cliente.")
                     print("     [5] Solicitud de atención.")
                     print("     [6] Simular actividad del punto de atención.")
-                    print("     [7] Volver al menú principal.")
+                    print("     [7] Producir gráfica de la estructura simulada.")
+                    print("     [8] Volver al menú principal.")
                     print("")
                     print(" Escriba el número de acuerdo a la opción que desee: ")
 
@@ -387,7 +391,7 @@ class Menu:
                     elif submenu_selected_option_3 == 5: # Solicitud de atención
                         if self.sim_obj.test_initialized:
                             print("     ¯¨'*•~-.¸¸,.-~*'[ Solicitud de atención ]¯¨'*•~-.¸¸,.-~*'")
-                            temp = self.disp_client_list.first
+                            temp = self.sim_obj.disp_client_list.first
                             if self.sim_obj.disp_client_list.cant > 0:
                                 self.sim_obj.request_service()
                             else:
@@ -398,21 +402,45 @@ class Menu:
                             print(" (!) No se ha iniciado una simulación.")
                             print("")
                     elif submenu_selected_option_3 == 6: # Inicialización de la simulación
-                        if self.sim_obj.to_test_setting != None:
-                            print(" *** Inicializando la simulación...")                        
-                            self.sim_obj.initialize_test()
-                            print(" *** Simulación inicializada.")
+                        if self.sim_obj.to_test_point != None and self.sim_obj.to_test_company != None:
+                            if self.sim_obj.test_initialized:
+                                print(" (!) Existe una simulación en curso.")
+                                print(" *** ¿Desea detener la simulación y empezar una nueva?")
+                                print(" *** Escriba '1' para iniciar nueva, '0' para continuar con la actual.")
+                                sim_option = 0
+                                try:
+                                    sim_option = int(input())
+                                except:
+                                    print(" Opción no válida, continuará la simulación actual.")
+                                    continue
+
+                                if sim_option == 1:
+                                    self.sim_obj.reset_sim_vars()
+                                else:
+                                    print(" *** Continuará la simulación actual.")
+                                    continue
+
+                            if self.sim_obj.to_test_setting != None:                            
+                                print(" *** Inicializando la simulación...")                        
+                                self.sim_obj.initialize_test()
+                                print(" *** Simulación inicializada.")
+                                print("")
+                            else:
+                                print(" (!) No se ha aplicado una configuración inicial.")
+                                print("")
+                        else:
+                            print(" (!) No se ha seleccionado una empresa y punto de atención para la prueba.")
+                            print("")
+                    elif submenu_selected_option_3 == 7: # Gráfica
+                        if self.sim_obj.test_initialized:
+                            print("")
+                            self.writer_obj.writeDOT(self.sim_obj.to_test_point, self.sim_obj.to_test_client_list, 1)
                             print("")
                         else:
-                            print(" (!) No se ha aplicado una configuración inicial.")
-                            print("")
-                    elif submenu_selected_option_3 == 7: # Regresar al menú principal.
+                            print(" (!) No se ha inicializado la simulación.")
+                    elif submenu_selected_option_3 == 8: # Regresar al menú principal.
                         break
             elif selected_option == 4:
-                print("menu 4")
-            elif selected_option == 5:
-                print("menu 5")
-            elif selected_option == 6:
                 self.exit = True
                 print("")
                 print("Se cerrará el programa.")

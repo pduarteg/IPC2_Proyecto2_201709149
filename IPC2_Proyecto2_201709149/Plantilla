@@ -1,0 +1,20 @@
+digraph Plantilla {		
+	rankdir="LR"
+	layout=dot
+	label = "Estado del punto de atencion."
+	node [shape=box color=deeppink3 style=filled fillcolor=salmon]
+	R [label="Punto de atencion: NOMBRE" shape="Mrecord"]
+	a [label="Clientes en espera:" shape="Mrecord"]
+	esc1 [label="escritorio: uno \n encargado: abril \n transacciones: \n -t1 \n -t2"]
+	{
+		R->esc1;
+		R->esc2;
+		R->esc3;
+
+		a->b;
+		b->c;
+		c->d;
+		d->e;
+	}
+	label = "Estado del punto y escritorios activos del punto."
+}	

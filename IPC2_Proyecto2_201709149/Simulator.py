@@ -105,6 +105,21 @@ class Simulator:
         self.to_test_point.med_a_time = self.point_med_a_time
         print(" *** Atención finalizada.")
 
+    def reset_sim_vars(self):
+        print(" *** Reseteando simulación previa...")
+        self.to_test_point.reset_sim_data()
+        self.clients_in = 0
+        self.clients_out = 0
+        self.point_total_wait_time = 0
+        self.point_min_wait_time = 0
+        self.point_max_wait_time = 0
+        self.point_med_time = 0
+        self.point_med_a_time = 0
+        self.point_min_a_time = 0
+        self.point_max_a_time = 0
+        self.actual_wait_time = 0
+        self.test_initialized = False
+
     def initialize_test(self):
         # Reseteando información de pruebas anteriores
         self.to_test_point.reset_sim_data()

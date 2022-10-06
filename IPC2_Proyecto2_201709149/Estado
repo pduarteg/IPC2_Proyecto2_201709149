@@ -1,0 +1,22 @@
+digraph Estado {
+	layout=dot
+	rankdir="LR"
+	label = "Estado del punto y escritorios activos del punto."
+	node [shape=box color=deeppink3 style=filled fillcolor=salmon]
+
+	R1 [label="Punto de atencion: punto11" shape="Mrecord"]
+	R2 [label="Clientes en espera:" shape="Mrecord"]
+	D0 [label="Escritorio: esc11-1\nIdentificación: Ident Escritorio 11-1\nEncargado: EP1L1-1\nTiempo de atención mínimo: 0\nTiempo de atención máximo: 6\nAtendidos: 1\nTiempo de atención medio: 6.0"]
+	D1 [label="Escritorio: esc11-2\nIdentificación: Ident Escritorio 11-2\nEncargado: EP1L1-2\nTiempo de atención mínimo: 0\nTiempo de atención máximo: 8\nAtendidos: 1\nTiempo de atención medio: 8.0"]
+	D2 [label="Escritorio: esc11-3\nIdentificación: Ident Escritorio 11-3\nEncargado: EP1L1-3\nTiempo de atención mínimo: 0\nTiempo de atención máximo: 0\nAtendidos: 0\nTiempo de atención medio: 0"]
+	D3 [label="Escritorio: esc11-4\nIdentificación: Ident Escritorio 11-4\nEncargado: EP1L1-4\nTiempo de atención mínimo: 0\nTiempo de atención máximo: 0\nAtendidos: 0\nTiempo de atención medio: 0"]
+	C0 [label="Sin clientes en la cola actual"]
+
+	{
+		R1->D0
+		R1->D1
+		R1->D2
+		R1->D3
+		R2->C0
+	}
+}
